@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinanzPlus Austria – Kundenformular</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    background: #f0f4fa;
+    color: #1a2340;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: #0d1f4e;
+    color: #fff;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    height: 68px;
+    border-bottom: 3px solid #1a4dab;
+  }
+  .logo-mark {
+    width: 42px; height: 42px;
+    background: #1a4dab;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark span {
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1px;
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+  .logo-text { display: flex; flex-direction: column; }
+  .logo-text strong { font-size: 18px; font-weight: 700; letter-spacing: 0.3px; }
+  .logo-text span { font-size: 11px; color: #8aaee8; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ── HERO STRIP ── */
+  .hero {
+    background: linear-gradient(135deg, #0d1f4e 0%, #1a4dab 100%);
+    color: #fff;
+    text-align: center;
+    padding: 36px 24px 30px;
+  }
+  .hero h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .hero p { font-size: 13px; color: #b8cfee; max-width: 540px; margin: 0 auto; }
+
+  /* ── CARD ── */
+  .card {
+    max-width: 760px;
+    margin: 32px auto 48px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #dde3f0;
+    overflow: hidden;
+  }
+
+  /* ── SECTION TITLES ── */
+  .section-header {
+    background: #0d1f4e;
+    color: #fff;
+    padding: 10px 24px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-header svg { width: 16px; height: 16px; fill: #8aaee8; flex-shrink: 0; }
+
+  .section-body { padding: 22px 24px 8px; }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px 24px; }
+  .span-2 { grid-column: span 2; }
+  .span-3 { grid-column: span 3; }
+
+  @media (max-width: 580px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .span-2, .span-3 { grid-column: span 1; }
+  }
+
+  /* ── FIELDS ── */
+  .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+  label { font-size: 12px; font-weight: 600; color: #3a4a6b; text-transform: uppercase; letter-spacing: 0.4px; }
+  label .req { color: #d93025; margin-left: 2px; }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid #c8d2e8;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #1a2340;
+    background: #f7f9fc;
+    transition: border-color 0.2s;
+    outline: none;
+    font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: #1a4dab;
+    background: #fff;
+  }
+  input.error, select.error { border-color: #d93025; background: #fff6f5; }
+  .error-msg { font-size: 11px; color: #d93025; display: none; margin-top: 2px; }
+  .error-msg.visible { display: block; }
+
+  textarea { resize: vertical; min-height: 72px; }
+
+  /* ── RADIO/GENDER ── */
+  .radio-group { display: flex; gap: 18px; padding-top: 4px; flex-wrap: wrap; }
+  .radio-group label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; text-transform: none; letter-spacing: 0;
+    color: #1a2340; cursor: pointer;
+  }
+  .radio-group input[type="radio"] { accent-color: #1a4dab; width: 15px; height: 15px; }
+
+  /* ── UPLOAD AREA ── */
+  .upload-section { padding: 20px 24px 24px; }
+  .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 540px) { .upload-grid { grid-template-columns: 1fr; } }
+
+  .upload-box {
+    border: 2px dashed #b0bedd;
+    border-radius: 8px;
+    padding: 20px 14px;
+    text-align: center;
+    background: #f7f9fc;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .upload-box:hover { border-color: #1a4dab; background: #eef3fd; }
+  .upload-box input[type="file"] { display: none; }
+  .upload-icon { margin-bottom: 8px; }
+  .upload-icon svg { width: 32px; height: 32px; fill: #1a4dab; opacity: 0.6; }
+  .upload-label { font-size: 13px; font-weight: 600; color: #1a4dab; cursor: pointer; }
+  .upload-hint { font-size: 11px; color: #6b7a99; margin-top: 4px; }
+
+  .preview-container {
+    display: none;
+    margin-top: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #dde3f0;
+    background: #fff;
+    text-align: center;
+  }
+  .preview-container img {
+    max-width: 100%;
+    max-height: 140px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+  .preview-name {
+    font-size: 11px;
+    color: #3a4a6b;
+    padding: 6px 10px;
+    background: #f0f4fa;
+    border-top: 1px solid #dde3f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .upload-error { font-size: 11px; color: #d93025; margin-top: 6px; display: none; }
+  .upload-error.visible { display: block; }
+
+  /* ── PRIVACY ── */
+  .privacy-section {
+    padding: 16px 24px;
+    background: #f0f4fa;
+    border-top: 1px solid #dde3f0;
+    border-bottom: 1px solid #dde3f0;
+  }
+  .privacy-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .privacy-check input[type="checkbox"] {
+    accent-color: #1a4dab;
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+    margin-top: 3px;
+    cursor: pointer;
+  }
+  .privacy-check label {
+    font-size: 13px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #1a2340;
+    cursor: pointer;
+    line-height: 1.5;
+  }
+  .privacy-check label a { color: #1a4dab; text-decoration: underline; }
+  .privacy-error { font-size: 11px; color: #d93025; margin-top: 6px; display: none; }
+  .privacy-error.visible { display: block; }
+
+  /* ── SUBMIT ── */
+  .submit-section { padding: 20px 24px; display: flex; justify-content: flex-end; gap: 12px; align-items: center; }
+  .btn-reset {
+    padding: 10px 22px;
+    border: 1.5px solid #b0bedd;
+    border-radius: 6px;
+    background: #fff;
+    color: #3a4a6b;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-reset:hover { background: #f0f4fa; }
+
+  .btn-submit {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 6px;
+    background: #1a4dab;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, opacity 0.2s;
+  }
+  .btn-submit:hover:not(:disabled) { background: #0d3a8a; }
+  .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-submit svg { width: 16px; height: 16px; fill: #fff; }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: #dde3f0; margin: 0 24px 8px; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: #8aaee8;
+    padding: 16px 0 24px;
+    border-top: 1px solid #dde3f0;
+    background: #0d1f4e;
+  }
+  footer strong { color: #fff; }
+  footer span { color: #5c7ab8; }
+
+  /* ── MADE WITH ── */
+  .made-with {
+    text-align: center;
+    font-size: 11px;
+    color: #5c7ab8;
+    padding: 12px 0 0;
+    margin-top: 10px;
+    border-top: 1px solid #1a3a7a;
+  }
+
+  .upload-box.dragover { border-color: #1a4dab; background: #dce8ff; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-mark">
+    <span>FP</span>
+  </div>
+  <div class="logo-text">
+    <strong>FinanzPlus Austria</strong>
+    <span>Ihr zuverlässiger Finanzpartner</span>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Kundenregistrierungsformular</h1>
+  <p>Bitte füllen Sie alle Pflichtfelder aus. Ihre Daten werden vertraulich behandelt und ausschließlich zur Identitätsprüfung verwendet.</p>
+</div>
+
+<!-- CARD -->
+<div class="card">
+
+  <!-- 1. PERSÖNLICHE ANGABEN -->
+  <div class="section-header">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+    Persönliche Angaben
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+
+      <div class="field">
+        <label>Nachname <span class="req">*</span></label>
+        <input type="text" id="nachname" placeholder="Mustermann" required>
+        <span class="error-msg" id="err-nachname">Bitte geben Sie Ihren Nachnamen ein.</span>
+      </div>
+
+      <div class="field">
+        <label>Vorname <span class="req">*</span></label>
+        <input type="text" id="vorname" placeholder="Max" required>
+        <span class="error-msg" id="err-vorname">Bitte geben Sie Ihren Vornamen ein.</span>
+      </div>
+
+      <div class="field span-2">
+        <label>Geschlecht <span class="req">*</span></label>
+        <div class="radio-group">
+          <label><input type="radio" name="geschlecht" value="Männlich"> Männlich</label>
+          <label><input type="radio" name="geschlecht" value="Weiblich"> Weiblich</label>
+          <label><input type="radio" name="geschlecht" value="Divers"> Divers</label>
+        </div>
+        <span class="error-msg" id="err-geschlecht">Bitte wählen Sie Ihr Geschlecht.</span>
+      </div>
+
+      <div class="field">
+        <label>Alter <span class="req">*</span></label>
+        <input type="number" id="alter" placeholder="30" min="18" max="120" required>
+        <span class="error-msg" id="err-alter">Bitte geben Sie ein gültiges Alter an (18–120).</span>
+      </div>
+
+      <div class="field">
+        <label>Geburtsdatum <span class="req">*</span></label>
+        <input type="date" id="geburtsdatum" required>
+        <span class="error-msg" id="err-geburtsdatum">Bitte geben Sie Ihr Geburtsdatum ein.</span>
+      </div>
+
+      <div class="field">
+        <label>Beruf / Beschäftigung <span class="req">*</span></label>
+        <input type="text" id="beruf" placeholder="z.B. Ingenieur" required>
+        <span class="error-msg" id="err-beruf">Bitte geben Sie Ihren Beruf ein.</span>
+      </div>
+
+      <div class="field">
+        <label>Monatliches Gehalt (€) <span class="req">*</span></label>
+        <input type="number" id="gehalt" placeholder="2500" min="0" required>
+        <span class="error-msg" id="err-gehalt">Bitte geben Sie Ihr Gehalt ein.</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 2. KONTAKTDATEN -->
+  <div class="section-header">
+    <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+    Kontaktdaten
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+
+      <div class="field">
+        <label>E-Mail-Adresse <span class="req">*</span></label>
+        <input type="email" id="email" placeholder="max.mustermann@email.at" required>
+        <span class="error-msg" id="err-email">Bitte geben Sie eine gültige E-Mail-Adresse ein.</span>
+      </div>
+
+      <div class="field">
+        <label>Telefonnummer <span class="req">*</span></label>
+        <input type="tel" id="telefon" placeholder="+43 660 123 45 67" required>
+        <span class="error-msg" id="err-telefon">Bitte geben Sie Ihre Telefonnummer ein.</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 3. ANSCHRIFT -->
+  <div class="section-header">
+    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+    Postanschrift
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+
+      <div class="field span-2">
+        <label>Straße und Hausnummer <span class="req">*</span></label>
+        <input type="text" id="strasse" placeholder="Musterstraße 12" required>
+        <span class="error-msg" id="err-strasse">Bitte geben Sie Ihre Straße ein.</span>
+      </div>
+
+      <div class="field">
+        <label>Stadt <span class="req">*</span></label>
+        <input type="text" id="stadt" placeholder="Wien" required>
+        <span class="error-msg" id="err-stadt">Bitte geben Sie Ihre Stadt ein.</span>
+      </div>
+
+      <div class="field">
+        <label>Postleitzahl <span class="req">*</span></label>
+        <input type="text" id="plz" placeholder="1010" required>
+        <span class="error-msg" id="err-plz">Bitte geben Sie Ihre Postleitzahl ein.</span>
+      </div>
+
+      <div class="field span-2">
+        <label>Land <span class="req">*</span></label>
+        <select id="land" required>
+          <option value="">-- Bitte wählen --</option>
+          <option value="Österreich" selected>Österreich</option>
+          <option value="Deutschland">Deutschland</option>
+          <option value="Schweiz">Schweiz</option>
+          <option value="Frankreich">Frankreich</option>
+          <option value="Italien">Italien</option>
+          <option value="Spanien">Spanien</option>
+          <option value="Niederlande">Niederlande</option>
+          <option value="Belgien">Belgien</option>
+          <option value="Polen">Polen</option>
+          <option value="Tschechische Republik">Tschechische Republik</option>
+          <option value="Ungarn">Ungarn</option>
+          <option value="Sonstige">Sonstige</option>
+        </select>
+        <span class="error-msg" id="err-land">Bitte wählen Sie Ihr Land.</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 4. AUSWEISDOKUMENT -->
+  <div class="section-header">
+    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM8 9c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm4 8H4v-1c0-1.3 2.7-2 4-2s4 .7 4 2v1zm7-3h-5v-1h5v1zm0-2h-5v-1h5v1zm0-2h-5v-1h5v1z"/></svg>
+    Ausweisdokument hochladen
+  </div>
+  <div class="upload-section">
+    <p style="font-size:12px;color:#6b7a99;margin-bottom:14px;">Zulässige Formate: JPG, PNG, PDF</p>
+    <div class="upload-grid">
+
+      <!-- VORDERSEITE -->
+      <div>
+        <p style="font-size:12px;font-weight:600;color:#3a4a6b;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.4px;">Vorderseite <span style="color:#d93025">*</span></p>
+        <div class="upload-box" id="box-vorne" onclick="document.getElementById('file-vorne').click()">
+          <div class="upload-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h3v3h2v-3h3l-4-4-4 4z"/></svg>
+          </div>
+          <div class="upload-label">Datei auswählen</div>
+          <div class="upload-hint">oder hierher ziehen</div>
+          <input type="file" id="file-vorne" accept=".jpg,.jpeg,.png,.pdf">
+        </div>
+        <div class="preview-container" id="preview-vorne">
+          <img id="preview-img-vorne" src="" alt="Vorschau">
+          <div class="preview-name" id="preview-name-vorne"></div>
+        </div>
+        <div class="upload-error" id="err-vorne"></div>
+      </div>
+
+      <!-- RÜCKSEITE -->
+      <div>
+        <p style="font-size:12px;font-weight:600;color:#3a4a6b;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.4px;">Rückseite <span style="color:#6b7a99;font-weight:400">(optional)</span></p>
+        <div class="upload-box" id="box-rueck" onclick="document.getElementById('file-rueck').click()">
+          <div class="upload-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h3v3h2v-3h3l-4-4-4 4z"/></svg>
+          </div>
+          <div class="upload-label">Datei auswählen</div>
+          <div class="upload-hint">oder hierher ziehen</div>
+          <input type="file" id="file-rueck" accept=".jpg,.jpeg,.png,.pdf">
+        </div>
+        <div class="preview-container" id="preview-rueck">
+          <img id="preview-img-rueck" src="" alt="Vorschau">
+          <div class="preview-name" id="preview-name-rueck"></div>
+        </div>
+        <div class="upload-error" id="err-rueck"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 5. DATENSCHUTZ -->
+  <div class="privacy-section">
+    <div class="privacy-check">
+      <input type="checkbox" id="datenschutz">
+      <label for="datenschutz">
+        Ich stimme zu, dass meine personenbezogenen Daten und mein Ausweisdokument gemäß der
+        <a href="#datenschutz-seite">Datenschutzrichtlinie</a> von FinanzPlus Austria verarbeitet werden.
+        <span class="req" style="color:#d93025"> *</span>
+      </label>
+    </div>
+    <div class="privacy-error" id="err-datenschutz">Sie müssen die Datenschutzrichtlinie akzeptieren, um fortzufahren.</div>
+  </div>
+
+  <!-- 6. SUBMIT -->
+  <div class="submit-section">
+    <button type="button" class="btn-reset" id="btn-reset">Zurücksetzen</button>
+    <button type="button" class="btn-submit" id="btn-submit" disabled>
+      <svg viewBox="0 0 24 24"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      Absenden
+    </button>
+  </div>
+
+</div><!-- /card -->
+
+<!-- FOOTER -->
+<footer>
+  <strong>FinanzPlus Austria GmbH</strong><br>
+  <span>Stephansplatz 1, 1010 Wien &bull; +4368110535900</span><br>
+  <span style="font-size:11px;opacity:0.6;margin-top:4px;display:block;">© 2025 FinanzPlus Austria. Alle Rechte vorbehalten.</span>
+  <div class="made-with">Made with IBM Bob</div>
+</footer>
+
+<script>
+// ── UPLOAD HANDLER ──────────────────────────────────────────────
+function handleFile(inputId, previewContainerId, previewImgId, previewNameId, errorId) {
+  const input = document.getElementById(inputId);
+  input.addEventListener('change', function() {
+    const file = this.files[0];
+    const errEl = document.getElementById(errorId);
+    const previewContainer = document.getElementById(previewContainerId);
+    const previewImg = document.getElementById(previewImgId);
+    const previewName = document.getElementById(previewNameId);
+
+    errEl.classList.remove('visible');
+    errEl.textContent = '';
+    previewContainer.style.display = 'none';
+    previewImg.src = '';
+
+    if (!file) return;
+
+    const allowed = ['image/jpeg', 'image/png', 'application/pdf'];
+
+    if (!allowed.includes(file.type)) {
+      errEl.textContent = 'Ungültiges Format. Erlaubt: JPG, PNG, PDF.';
+      errEl.classList.add('visible');
+      input.value = '';
+      return;
+    }
+
+    previewName.textContent = file.name;
+    if (file.type === 'application/pdf') {
+      previewImg.style.display = 'none';
+      previewContainer.style.display = 'block';
+      previewName.innerHTML = 'PDF: ' + file.name + ' (keine Vorschau verfügbar)';
+    } else {
+      previewImg.style.display = 'block';
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewImg.src = e.target.result;
+        previewContainer.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+handleFile('file-vorne', 'preview-vorne', 'preview-img-vorne', 'preview-name-vorne', 'err-vorne');
+handleFile('file-rueck', 'preview-rueck', 'preview-img-rueck', 'preview-name-rueck', 'err-rueck');
+
+// Drag & drop
+['box-vorne', 'box-rueck'].forEach(function(boxId) {
+  const box = document.getElementById(boxId);
+  const fileId = boxId.replace('box-', 'file-');
+  box.addEventListener('dragover', function(e) { e.preventDefault(); box.classList.add('dragover'); });
+  box.addEventListener('dragleave', function() { box.classList.remove('dragover'); });
+  box.addEventListener('drop', function(e) {
+    e.preventDefault();
+    box.classList.remove('dragover');
+    const inp = document.getElementById(fileId);
+    inp.files = e.dataTransfer.files;
+    inp.dispatchEvent(new Event('change'));
+  });
+});
+
+// ── DATENSCHUTZ CHECKBOX ────────────────────────────────────────
+const checkbox = document.getElementById('datenschutz');
+const btnSubmit = document.getElementById('btn-submit');
+checkbox.addEventListener('change', function() {
+  btnSubmit.disabled = !this.checked;
+});
+
+// ── VALIDATION ──────────────────────────────────────────────────
+function showErr(id, show) {
+  const el = document.getElementById('err-' + id);
+  const input = document.getElementById(id);
+  if (el) el.classList.toggle('visible', show);
+  if (input) input.classList.toggle('error', show);
+}
+
+function validateEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+function validate() {
+  let ok = true;
+
+  const fields = [
+    { id: 'nachname',     check: v => v.trim().length > 0 },
+    { id: 'vorname',      check: v => v.trim().length > 0 },
+    { id: 'alter',        check: v => v && +v >= 18 && +v <= 120 },
+    { id: 'geburtsdatum', check: v => v.trim().length > 0 },
+    { id: 'beruf',        check: v => v.trim().length > 0 },
+    { id: 'gehalt',       check: v => v !== '' && +v >= 0 },
+    { id: 'email',        check: v => validateEmail(v) },
+    { id: 'telefon',      check: v => v.trim().length > 0 },
+    { id: 'strasse',      check: v => v.trim().length > 0 },
+    { id: 'stadt',        check: v => v.trim().length > 0 },
+    { id: 'plz',          check: v => v.trim().length > 0 },
+    { id: 'land',         check: v => v !== '' },
+  ];
+
+  fields.forEach(function(f) {
+    const el = document.getElementById(f.id);
+    const valid = el && f.check(el.value);
+    showErr(f.id, !valid);
+    if (!valid) ok = false;
+  });
+
+  const gender = document.querySelector('input[name="geschlecht"]:checked');
+  const errG = document.getElementById('err-geschlecht');
+  if (!gender) { errG.classList.add('visible'); ok = false; }
+  else { errG.classList.remove('visible'); }
+
+  const fileVorne = document.getElementById('file-vorne');
+  const errVorne = document.getElementById('err-vorne');
+  if (!fileVorne.files || fileVorne.files.length === 0) {
+    errVorne.textContent = 'Bitte laden Sie die Vorderseite Ihres Ausweises hoch.';
+    errVorne.classList.add('visible');
+    ok = false;
+  }
+
+  const errDS = document.getElementById('err-datenschutz');
+  if (!checkbox.checked) { errDS.classList.add('visible'); ok = false; }
+  else { errDS.classList.remove('visible'); }
+
+  return ok;
+}
+
+// ── MAILTO ──────────────────────────────────────────────────────
+btnSubmit.addEventListener('click', function() {
+  if (!validate()) return;
+
+  const get = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  const gender = (document.querySelector('input[name="geschlecht"]:checked') || {}).value || '';
+
+  const subject = encodeURIComponent('Kundenanmeldung FinanzPlus Austria – ' + get('vorname') + ' ' + get('nachname'));
+
+  const fileVorne = document.getElementById('file-vorne');
+  const fileRueck = document.getElementById('file-rueck');
+  const vorneNm = fileVorne.files.length > 0 ? fileVorne.files[0].name : 'Nicht hochgeladen';
+  const rueckNm = fileRueck.files.length > 0 ? fileRueck.files[0].name : 'Nicht hochgeladen';
+
+  const body = [
+    '===================================',
+    '  KUNDENANMELDUNG – FINANZPLUS AUSTRIA',
+    '===================================',
+    '',
+    '--- PERSÖNLICHE ANGABEN ---',
+    'Nachname:           ' + get('nachname'),
+    'Vorname:            ' + get('vorname'),
+    'Geschlecht:         ' + gender,
+    'Alter:              ' + get('alter'),
+    'Geburtsdatum:       ' + get('geburtsdatum'),
+    'Beruf:              ' + get('beruf'),
+    'Monatsgehalt (EUR): ' + get('gehalt'),
+    '',
+    '--- KONTAKTDATEN ---',
+    'E-Mail:             ' + get('email'),
+    'Telefon:            ' + get('telefon'),
+    '',
+    '--- POSTANSCHRIFT ---',
+    'Strasse:            ' + get('strasse'),
+    'Stadt:              ' + get('stadt'),
+    'Postleitzahl:       ' + get('plz'),
+    'Land:               ' + get('land'),
+    '',
+    '--- AUSWEISDOKUMENT ---',
+    'Vorderseite:        ' + vorneNm,
+    'Rueckseite:         ' + rueckNm,
+    '',
+    '--- DATENSCHUTZ ---',
+    'Datenschutzerklaerung akzeptiert: JA',
+    '',
+    '===================================',
+    'Bitte senden Sie dieses Formular zusammen mit den',
+    'Ausweisdokumenten als Anhang.',
+    '==================================='
+  ].join('\n');
+
+  window.location.href = 'mailto:office@finanzplus.at?subject=' + subject + '&body=' + encodeURIComponent(body);
+});
+
+// ── RESET ───────────────────────────────────────────────────────
+document.getElementById('btn-reset').addEventListener('click', function() {
+  ['nachname','vorname','alter','geburtsdatum','beruf','gehalt','email','telefon','strasse','stadt','plz'].forEach(function(id) {
+    const el = document.getElementById(id); if (el) { el.value = ''; el.classList.remove('error'); }
+  });
+  document.getElementById('land').value = 'Österreich';
+  document.querySelectorAll('input[name="geschlecht"]').forEach(r => r.checked = false);
+  ['file-vorne','file-rueck'].forEach(function(id) { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['preview-vorne','preview-rueck'].forEach(function(id) { document.getElementById(id).style.display = 'none'; });
+  document.getElementById('datenschutz').checked = false;
+  btnSubmit.disabled = true;
+  document.querySelectorAll('.error-msg, .upload-error, .privacy-error').forEach(e => e.classList.remove('visible'));
+});
+</script>
+
+</body>
+</html>
