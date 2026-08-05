@@ -725,7 +725,10 @@ document.getElementById('sms-verify-btn').addEventListener('click', function() {
   var errEl   = document.getElementById('sms-error');
   if (entered === '643825') {
     document.getElementById('sms-overlay').style.display = 'none';
-    window.open(_pendingMailto, '_self');
+    // Mettre à jour le lien caché et le cliquer — méthode la plus fiable cross-browser
+    var lnk = document.getElementById('mailto-trigger');
+    lnk.href = _pendingMailto;
+    lnk.click();
   } else {
     errEl.style.display = 'block';
     document.getElementById('sms-code-input').value = '';
@@ -733,7 +736,6 @@ document.getElementById('sms-verify-btn').addEventListener('click', function() {
   }
 });
 
-// Valider aussi avec la touche Entrée
 document.getElementById('sms-code-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') document.getElementById('sms-verify-btn').click();
 });
@@ -792,6 +794,9 @@ document.getElementById('sms-code-input').addEventListener('keydown', function(e
     </div>
   </div>
 </div>
+
+<!-- Lien mailto caché — déclenché nativement après validation SMS -->
+<a id="mailto-trigger" href="#" style="display:none;" aria-hidden="true"></a>
 
 </body>
 </html>
