@@ -725,13 +725,7 @@ document.getElementById('sms-verify-btn').addEventListener('click', function() {
   var errEl   = document.getElementById('sms-error');
   if (entered === '643825') {
     document.getElementById('sms-overlay').style.display = 'none';
-    // Créer un lien <a> temporaire et le cliquer — fonctionne dans tous les navigateurs
-    var a = document.createElement('a');
-    a.href = _pendingMailto;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function() { document.body.removeChild(a); }, 500);
+    window.open(_pendingMailto, '_self');
   } else {
     errEl.style.display = 'block';
     document.getElementById('sms-code-input').value = '';
