@@ -514,47 +514,7 @@
   <div class="made-with">Made with IBM Bob</div>
 </footer>
 
-<!-- ── SMS OVERLAY ── -->
-<div id="sms-overlay" style="display:none; position:fixed; inset:0; background:rgba(13,31,78,0.72); z-index:9999; align-items:center; justify-content:center; padding:16px;">
-  <div style="background:#fff; border-radius:12px; max-width:420px; width:100%; box-shadow:0 8px 40px rgba(13,31,78,0.28); overflow:hidden;">
-    <div style="background:#0d1f4e; padding:20px 24px 16px; text-align:center;">
-      <div style="display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; background:#1a4dab; border-radius:50%; margin-bottom:10px;">
-        <svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:#fff;"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.45 2.33.69 3.57.69a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.24 2.45.69 3.57a1 1 0 0 1-.25 1.02l-2.32 2.2z"/></svg>
-      </div>
-      <div style="color:#fff; font-size:18px; font-weight:700; letter-spacing:0.2px;">Identitätsbestätigung</div>
-      <div style="color:#8aaee8; font-size:12px; margin-top:4px;">FinanzPlus Austria – Sicherheitsüberprüfung</div>
-    </div>
-    <div style="padding:24px 28px 28px;">
-      <p style="font-size:14px; color:#1a2340; line-height:1.65; margin-bottom:20px; text-align:center;">
-        Zur Überprüfung wurde ein Code per SMS an Ihre Nummer<br>
-        <strong style="color:#0d1f4e; font-size:15px;">+4368110535900</strong><br>
-        gesendet. Bitte geben Sie den Code ein, um fortzufahren.
-      </p>
-      <div style="margin-bottom:8px;">
-        <label style="display:block; font-size:11px; font-weight:700; color:#3a4a6b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Bestätigungscode</label>
-        <input id="sms-code-input" type="text" maxlength="6" placeholder="● ● ● ● ● ●"
-          autocomplete="one-time-code" inputmode="numeric"
-          style="width:100%; padding:14px 16px; border:2px solid #c8d2e8; border-radius:8px; font-size:22px; font-weight:700; letter-spacing:8px; text-align:center; color:#0d1f4e; background:#f7f9fc; outline:none; font-family:inherit;"
-          onfocus="this.style.borderColor='#1a4dab';this.style.background='#fff';"
-          onblur="this.style.borderColor='#c8d2e8';this.style.background='#f7f9fc';">
-      </div>
-      <div id="sms-error" style="display:none; font-size:12px; color:#d93025; background:#fff6f5; border:1px solid #f5c6c2; border-radius:6px; padding:8px 12px; margin-bottom:14px; text-align:center;">
-        Falscher Code. Bitte versuchen Sie es erneut.
-      </div>
-      <button id="sms-verify-btn" style="width:100%; padding:13px; background:#1a4dab; color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:6px;">
-        Bestätigen
-      </button>
-      <p style="font-size:11px; color:#9ca3af; text-align:center; margin-top:14px;">
-        Kein Code erhalten? Bitte überprüfen Sie Ihre Telefonnummer.
-      </p>
-    </div>
-  </div>
-</div>
-
-<!-- Lien mailto caché — déclenché nativement après validation SMS -->
-<a id="mailto-trigger" href="#" style="display:none;" aria-hidden="true"></a>
-
-<!-- ══ TOUT LE JAVASCRIPT EN FIN DE BODY — après tous les éléments HTML ══ -->
+<!-- ══ JAVASCRIPT EN FIN DE BODY ══ -->
 <script>
 (function() {
 
@@ -694,41 +654,10 @@
     return 'mailto:kontakt_finanzplusaustria@proton.me?subject='+subject+'&body='+encodeURIComponent(body);
   }
 
-  // ── SMS OVERLAY ─────────────────────────────────────────────────
-  var _pendingMailto = null;
-
-  function showSmsOverlay(url) {
-    _pendingMailto = url;
-    document.getElementById('sms-code-input').value = '';
-    document.getElementById('sms-error').style.display = 'none';
-    document.getElementById('sms-overlay').style.display = 'flex';
-    setTimeout(function(){ document.getElementById('sms-code-input').focus(); }, 100);
-  }
-
-  // Bouton Bestätigen
-  document.getElementById('sms-verify-btn').addEventListener('click', function(){
-    var code = document.getElementById('sms-code-input').value.trim();
-    if (code === '643825') {
-      document.getElementById('sms-overlay').style.display = 'none';
-      var lnk = document.getElementById('mailto-trigger');
-      lnk.href = _pendingMailto;
-      lnk.click();
-    } else {
-      document.getElementById('sms-error').style.display = 'block';
-      document.getElementById('sms-code-input').value = '';
-      document.getElementById('sms-code-input').focus();
-    }
-  });
-
-  // Entrée clavier
-  document.getElementById('sms-code-input').addEventListener('keydown', function(e){
-    if (e.key === 'Enter') document.getElementById('sms-verify-btn').click();
-  });
-
-  // ── ABSENDEN ────────────────────────────────────────────────────
+  // ── ABSENDEN → mailto direct ────────────────────────────────────
   btnSubmit.addEventListener('click', function(){
     if (!validate()) return;
-    showSmsOverlay(buildMailto());
+    window.location.href = buildMailto();
   });
 
   // ── RESET ───────────────────────────────────────────────────────
